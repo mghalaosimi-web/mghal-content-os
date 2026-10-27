@@ -30,6 +30,7 @@ export const generatedContentResultSchema = z.object({
     }, 'WhatsApp is strictly forbidden in this platform scope'),
   suggestedVisualPrompt: z.string().min(5, 'Visual prompt is required'),
   modelUsed: z.string().default('gemini-2.5-flash'),
+  mode: z.enum(['LIVE_GEMINI', 'LOCAL_FALLBACK']).default('LOCAL_FALLBACK'),
   durationMs: z.number().int().nonnegative().optional(),
 });
 

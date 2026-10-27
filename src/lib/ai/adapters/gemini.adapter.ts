@@ -27,12 +27,17 @@ export class GeminiAdapter implements AIProvider {
     this.apiKey = options?.apiKey || process.env.GEMINI_API_KEY;
   }
 
+  public hasValidApiKey(): boolean {
+    if (!this.apiKey) return false;
+    const key = this.apiKey.trim();
+    return key.length > 10 && !key.startsWith('your-') && key !== 'undefined';
+  }
+
   async generateContent(input: ContentGenerationInput): Promise<GeneratedContentResult> {
     const startTime = Date.now();
 
-    // If API key is not configured, return an authentic, high-quality Arabic template
-    // allowing the system to run in development while instructing the user on key setup.
-    if (!this.apiKey) {
+    // If API key is not configured or placeholder, transparently use the high-quality local fallback generator
+    if (!this.hasValidApiKey()) {
       return this.generateSimulatedFallback(input, startTime);
     }
 
@@ -96,6 +101,7 @@ export class GeminiAdapter implements AIProvider {
       const validated = generatedContentResultSchema.parse({
         ...parsedData,
         modelUsed: this.model,
+        mode: 'LIVE_GEMINI',
         durationMs,
       });
 
@@ -128,6 +134,8 @@ export class GeminiAdapter implements AIProvider {
       brief: `محتوى استراتيجي تم توليده حول: ${input.topic} يركز على التطوير العملي والتأثير الإيجابي.`,
       contentType: input.contentType,
       language: 'ar',
+      mode: 'LOCAL_FALLBACK',
+      modelUsed: 'محاكي محلي (Local Fallback - لم يُضبط GEMINI_API_KEY)',
       variants: [
         {
           platform: 'FACEBOOK',
@@ -153,7 +161,6 @@ export class GeminiAdapter implements AIProvider {
       ],
       suggestedVisualPrompt:
         'A cinematic dark minimalist workspace with subtle green emerald ambient glow, soft depth of field, 8k resolution',
-      modelUsed: 'gemini-2.5-flash-simulated',
       durationMs,
     };
   }

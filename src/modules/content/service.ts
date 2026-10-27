@@ -1,4 +1,4 @@
-import prisma from '@/lib/db/prisma';
+import { ContentStorage } from './storage';
 import {
   createContentItemSchema,
   updateContentItemSchema,
@@ -50,12 +50,18 @@ export class ContentService {
   }
 
   /**
-   * Create a new ContentItem with audit logging
+   * Create a new ContentItem with audit logging safely via ContentStorage
    */
   static async createContent(input: CreateContentItemInput) {
     const validated = this.validateContentInput(input);
-    const item = await prisma.contentItem.create({
-      data: validated,
+    const item = await ContentStorage.add({
+      title: validated.title,
+      topic: validated.topic,
+      brief: validated.brief || null,
+      contentType: validated.contentType,
+      status: validated.status,
+      language: validated.language,
+      platformVariants: [],
     });
 
     await this.recordAudit({
@@ -72,40 +78,26 @@ export class ContentService {
   }
 
   /**
-   * Update status of a ContentItem
+   * Update status of a ContentItem safely via ContentStorage
    */
   static async updateStatus(id: string, status: ContentStatus) {
-    const updated = await prisma.contentItem.update({
-      where: { id },
-      data: { status },
-    });
-
-    await this.recordAudit({
-      action: 'CONTENT_STATUS_UPDATED',
-      entityType: 'ContentItem',
-      entityId: id,
-      status: 'SUCCESS',
-      metadata: { newStatus: status },
-    }).catch(() => {});
-
+    const updated = await ContentStorage.updateStatus(id, status);
     return updated;
   }
 
   /**
-   * Record an audit log entry
+   * Record an audit log entry safely via ContentStorage
    */
   static async recordAudit(input: CreateAuditLogInput) {
     const validated = this.validateAuditLogInput(input);
-    return prisma.auditLog.create({
-      data: {
-        action: validated.action,
-        entityType: validated.entityType,
-        entityId: validated.entityId,
-        status: validated.status,
-        durationMs: validated.durationMs,
-        errorCode: validated.errorCode,
-        metadata: validated.metadata ? JSON.parse(JSON.stringify(validated.metadata)) : undefined,
-      },
+    return ContentStorage.recordAudit({
+      action: validated.action,
+      entityType: validated.entityType,
+      entityId: validated.entityId || null,
+      status: validated.status,
+      durationMs: validated.durationMs,
+      errorCode: validated.errorCode,
+      metadata: validated.metadata,
     });
   }
 }

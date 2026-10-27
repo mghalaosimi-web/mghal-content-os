@@ -10,6 +10,7 @@ export const envSchema = z.object({
   NEXT_PUBLIC_APP_NAME: z.string().default('M.GH.AL Content Studio'),
   NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
   GEMINI_API_KEY: z.string().optional(),
+  ENCRYPTION_KEY: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

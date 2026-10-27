@@ -12,6 +12,28 @@ const generateRequestSchema = z.object({
   saveToDatabase: z.boolean().optional().default(true),
 });
 
+export async function GET() {
+  const rawKey = process.env.GEMINI_API_KEY;
+  const isKeyConfigured = Boolean(
+    rawKey && rawKey.trim().length > 10 && !rawKey.startsWith('your-') && rawKey !== 'undefined'
+  );
+
+  const aiStatus = isKeyConfigured ? 'LIVE_GEMINI' : 'AWAITING_GEMINI_KEY';
+
+  return NextResponse.json({
+    success: true,
+    aiStatus,
+    data: {
+      mode: aiStatus,
+      aiStatus,
+      hasValidApiKey: isKeyConfigured,
+      activeModel: isKeyConfigured
+        ? process.env.GEMINI_MODEL || 'gemini-2.5-flash'
+        : 'محاكي محلي (AWAITING_GEMINI_KEY - لم يُضبط المفتاح في .env)',
+    },
+  });
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -44,6 +66,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
+      mode: result.mode,
       data: result,
     });
   } catch (error: unknown) {

@@ -1,6 +1,13 @@
 import { z } from 'zod';
 
-export const ContentStatusEnum = z.enum(['DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'REJECTED']);
+export const ContentStatusEnum = z.enum([
+  'DRAFT',
+  'PENDING_APPROVAL',
+  'APPROVED',
+  'REJECTED',
+  'SCHEDULED',
+  'PUBLISHED',
+]);
 export type ContentStatus = z.infer<typeof ContentStatusEnum>;
 
 export const ContentTypeEnum = z.enum([

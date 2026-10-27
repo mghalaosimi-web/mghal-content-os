@@ -1,4 +1,4 @@
-import { getAIProvider, type ContentGenerationInput, type GeneratedContentResult } from '@/lib/ai';
+import { getAIProvider, type ContentGenerationInput, type GeneratedContentResult, type AIGenerationMode } from '@/lib/ai';
 import { ContentStorage } from './storage';
 
 export interface GenerateAndSaveOptions extends ContentGenerationInput {
@@ -8,6 +8,7 @@ export interface GenerateAndSaveOptions extends ContentGenerationInput {
 export interface GeneratedContentResponse {
   success: boolean;
   content: GeneratedContentResult;
+  mode: AIGenerationMode;
   persisted: boolean;
   contentItemId?: string;
   auditLogId?: string;
@@ -17,7 +18,7 @@ export interface GeneratedContentResponse {
 export class AIContentGenerator {
   /**
    * Generate Arabic content for Facebook, Instagram, and TikTok using AI provider
-   * and persist to ContentStorage (Prisma or fallback store).
+   * and persist to ContentStorage (Prisma or persistent local-db.json).
    */
   static async generate(options: GenerateAndSaveOptions): Promise<GeneratedContentResponse> {
     const provider = getAIProvider();
@@ -67,6 +68,7 @@ export class AIContentGenerator {
           durationMs: result.durationMs,
           metadata: {
             modelUsed: result.modelUsed,
+            mode: result.mode,
             topic: options.topic,
             variantsCount: result.variants.length,
           },
@@ -82,6 +84,7 @@ export class AIContentGenerator {
     return {
       success: true,
       content: result,
+      mode: result.mode,
       persisted,
       contentItemId,
       auditLogId,

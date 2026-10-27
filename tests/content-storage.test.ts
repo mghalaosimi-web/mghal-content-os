@@ -26,7 +26,8 @@ describe('ContentStorage & Dashboard Operations Tests (M003)', () => {
 
   it('should update variant caption and record audit event', async () => {
     const items = await ContentStorage.getAll();
-    const testItem = items[0];
+    const testItem =
+      items.find((i) => i.platformVariants.some((v) => v.platform === 'INSTAGRAM')) || items[0];
 
     const updatedVariant = await ContentStorage.updateVariant(testItem.id, 'INSTAGRAM', {
       caption: 'نص إنستغرام معدل بواسطة المحرر اليدوي 🎯',

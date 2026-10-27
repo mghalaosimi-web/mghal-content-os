@@ -86,7 +86,7 @@ pnpm exec prisma migrate dev --name init
 
 | الأمر | الوظيفة |
 | :--- | :--- |
-| `pnpm test` | تشغيل اختبارات Vitest (18 اختبار ناجح) |
+| `pnpm test` | تشغيل اختبارات Vitest (46 اختبار ناجح عبر 10 أجنحة اختبار) |
 | `pnpm run typecheck` | التحقق من صحة الأنواع في TypeScript بوضع strict |
 | `pnpm run lint` | تشغيل مدقق الأكواد ESLint |
 | `pnpm run build` | بناء حزمة الإنتاج لـ Next.js |

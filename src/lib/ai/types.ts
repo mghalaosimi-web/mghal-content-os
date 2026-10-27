@@ -1,5 +1,7 @@
 import type { ContentType, PlatformType } from '@/types';
 
+export type AIGenerationMode = 'LIVE_GEMINI' | 'LOCAL_FALLBACK';
+
 export interface ContentGenerationInput {
   topic: string;
   contentType: ContentType;
@@ -25,6 +27,7 @@ export interface GeneratedContentResult {
   variants: GeneratedVariant[];
   suggestedVisualPrompt: string;
   modelUsed: string;
+  mode: AIGenerationMode;
   durationMs?: number;
 }
 

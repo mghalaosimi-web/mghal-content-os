@@ -11,6 +11,8 @@ enum ContentStatus {
   PENDING_APPROVAL
   APPROVED
   REJECTED
+  SCHEDULED
+  PUBLISHED
 }
 
 enum ContentType {

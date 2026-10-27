@@ -40,3 +40,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local storage & generated media
+/data
+/data/*.json
+data/*.json
+data/local-db.json
+data/local-store.json
+/public/generated
+/public/test-output

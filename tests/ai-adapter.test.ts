@@ -25,6 +25,8 @@ describe('GeminiAdapter Tests', () => {
     expect(platforms).toContain('INSTAGRAM');
     expect(platforms).toContain('TIKTOK');
     expect(platforms).not.toContain('WHATSAPP');
+    expect(result.mode).toBe('LOCAL_FALLBACK');
+    expect(adapter.hasValidApiKey()).toBe(false);
 
     expect(result.suggestedVisualPrompt).toBeDefined();
   });
@@ -41,5 +43,10 @@ describe('GeminiAdapter Tests', () => {
       expect(variant.hashtags.length).toBeGreaterThan(0);
       expect(variant.mediaSuggestion.length).toBeGreaterThan(5);
     }
+  });
+
+  it('should detect valid API key correctly', () => {
+    const adapter = new GeminiAdapter({ apiKey: 'valid-mock-gemini-key-for-unit-test' });
+    expect(adapter.hasValidApiKey()).toBe(true);
   });
 });
