@@ -1,0 +1,130 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum ContentStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+}
+
+enum ContentType {
+  MOTIVATIONAL
+  SELF_DEVELOPMENT
+  CONTEMPLATIVE
+  EDUCATIONAL
+  STORY
+  AWARENESS
+  QUOTE_COMMENTARY
+}
+
+enum PlatformType {
+  FACEBOOK
+  INSTAGRAM
+  TIKTOK
+}
+
+enum VariantStatus {
+  DRAFT
+  READY_FOR_REVIEW
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  FAILED
+  CANCELLED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  AUDIO
+  SUBTITLE
+  THUMBNAIL
+}
+
+enum AuditStatus {
+  SUCCESS
+  FAILURE
+  WARNING
+  INFO
+}
+
+model ContentItem {
+  id          String        @id @default(cuid())
+  title       String
+  topic       String
+  brief       String?       @db.Text
+  contentType ContentType   @default(MOTIVATIONAL)
+  status      ContentStatus @default(DRAFT)
+  language    String        @default("ar")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  platformVariants PlatformVariant[]
+  mediaAssets      MediaAsset[]
+
+  @@index([status])
+  @@index([contentType])
+  @@index([createdAt])
+  @@map("content_items")
+}
+
+model PlatformVariant {
+  id            String        @id @default(cuid())
+  contentItemId String
+  platform      PlatformType
+  caption       String        @db.Text
+  hashtags      String[]      @default([])
+  status        VariantStatus @default(DRAFT)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  contentItem ContentItem @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+
+  @@unique([contentItemId, platform])
+  @@index([platform, status])
+  @@index([createdAt])
+  @@map("platform_variants")
+}
+
+model MediaAsset {
+  id            String    @id @default(cuid())
+  contentItemId String
+  mediaType     MediaType
+  storageKey    String?
+  mediaUrl      String?
+  mimeType      String
+  metadata      Json?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  contentItem ContentItem @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+
+  @@index([contentItemId])
+  @@index([mediaType])
+  @@index([createdAt])
+  @@map("media_assets")
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  action     String
+  entityType String
+  entityId   String?
+  status     AuditStatus @default(INFO)
+  durationMs Int?
+  errorCode  String?
+  metadata   Json?
+  createdAt  DateTime    @default(now())
+
+  @@index([action])
+  @@index([entityType, entityId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

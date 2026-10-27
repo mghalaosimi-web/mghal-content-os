@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# M.GH.AL — AI Content Automation System
+### نظام أتمتة المحتوى بالذكاء الاصطناعي (`mghal-content-os`)
 
-## Getting Started
+نظام ذكي متكامل مصمم لإدارة وإنتاج المحتوى العربي بالذكاء الاصطناعي، وتجهيز الصور والفيديوهات، ومراجعتها وجدولتها ونشرها تلقائياً على منصات التواصل الاجتماعي الرسمية (Facebook، Instagram، TikTok).
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 التقنيات المستخدمة
+- **الإطار والخادم:** [Next.js 16](https://nextjs.org/) (App Router, Turbopack)
+- **لغة البرمجة:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
+- **قاعدة البيانات:** PostgreSQL 16
+- **ORM:** [Prisma ORM 7](https://www.prisma.io/) مع `@prisma/adapter-pg`
+- **التحقق من البيانات:** [Zod](https://zod.dev/)
+- **التصميم:** Tailwind CSS v4
+- **مدير الحزم:** `pnpm`
+- **الاختبارات:** [Vitest](https://vitest.dev/)
+- **فحص الكود:** ESLint 9
+
+---
+
+## 📁 هيكلية المشروع
+```
+mghal-content-os/
+├── prisma/
+│   └── schema.prisma         # مخطط قاعدة البيانات (ContentItem, Variant, Media, Audit)
+├── prisma.config.ts          # إعدادات Prisma 7 للاتصال والترحيل
+├── src/
+│   ├── app/                  # صفحات ومسارات Next.js App Router
+│   ├── lib/
+│   │   ├── config/           # التحقق من متغيرات البيئة بواسطة Zod
+│   │   ├── db/               # عميل Prisma Client الموحد
+│   │   └── validation/       # مخططات التحقق للنماذج وقواعد الأعمال
+│   ├── modules/
+│   │   └── content/          # خدمات ومنطق أعمال المحتوى
+│   └── types/                # واجهات وأنواع البيانات العامة
+├── tests/                    # اختبارات الوحدة والتكامل
+├── docs/                     # وثائق المشروع الرسمية وسجلات الحالة
+├── docker-compose.yml        # تشغيل حاوية PostgreSQL محلية
+└── .env.example              # نموذج متغيرات البيئة الآمن
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ متطلبات التشغيل
+- **Node.js:** v20+ أو v24+
+- **pnpm:** v12+
+- **PostgreSQL:** v15+ أو v16+ (أو Docker)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## ⚙️ طريقة التثبيت والتشغيل
 
-To learn more about Next.js, take a look at the following resources:
+### 1. تثبيت الحزم
+```bash
+pnpm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. إعداد متغيرات البيئة
+انسخ ملف `.env.example` إلى `.env`:
+```bash
+cp .env.example .env
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. إعداد وتشغيل قاعدة البيانات (PostgreSQL)
+يمكنك تشغيل قاعدة بيانات محلية عبر Docker بسهولة:
+```bash
+docker compose up -d
+```
+أو ربط أي قاعدة بيانات PostgreSQL خارجية بتعديل المتغير `DATABASE_URL` في ملف `.env`.
 
-## Deploy on Vercel
+### 4. التحقق وتوليد عميل Prisma
+```bash
+# فحص والتحقق من صحة المخطط
+pnpm run prisma:validate
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# توليد أنواع عميل Prisma
+pnpm run prisma:generate
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# عند توفر اتصال حي بقاعدة البيانات، قم بتطبيق الترحيل:
+pnpm exec prisma migrate dev --name init
+```
+
+---
+
+## 🧪 تشغيل الفحوصات والاختبارات
+
+| الأمر | الوظيفة |
+| :--- | :--- |
+| `pnpm test` | تشغيل اختبارات Vitest (18 اختبار ناجح) |
+| `pnpm run typecheck` | التحقق من صحة الأنواع في TypeScript بوضع strict |
+| `pnpm run lint` | تشغيل مدقق الأكواد ESLint |
+| `pnpm run build` | بناء حزمة الإنتاج لـ Next.js |
+| `pnpm run dev` | تشغيل بيئة التطوير المحلية |
+
+---
+
+## 🔒 ضوابط الأمان والحدود
+1. **استبعاد واتساب:** منصة واتساب (WhatsApp) وحالاتها مستبعدة نهائياً من نطاق المشروع برمجياً ومخططاً.
+2. **عزل الأسرار:** لا يتم رفع أو حفظ أي مفاتيح API أو كلمات مرور أو رموز OAuth في الكود المصدري أو Git.
+3. **التكاملات الرسمية:** التعامل حصرياً مع واجهات المنصات المعتمدة (Facebook, Instagram, TikTok).
+4. **المسار المرحلي:** الانتقال بين المهام يتم بصرامة بعد التحقق والاختبار الفعلي لكل مرحلة.
