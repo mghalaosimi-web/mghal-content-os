@@ -1,85 +1,55 @@
 # M.GH.AL Content OS — تقرير حالة المشروع (Project Status)
-## المهمة M001: تأسيس المشروع وقاعدة البيانات
 
 **تاريخ التحديث:** 27 أكتوبر 2026  
-**حالة المهمة:** مكتملة بنجاح (مع بيان حالة قاعدة البيانات المباشرة)
+**المرحلة الحالية المنجزة:** M002 — محرك الذكاء الاصطناعي وتكامل Gemini API (مكتملة بنجاح)
 
 ---
 
-### 1. ما تم إنجازه
-1. **تأسيس المشروع المستقل:**
-   - تم إنشاء المستودع في مجلد مستقل: `C:\Users\pc\.gemini\antigravity-ide\scratch\mghal-content-os`
-   - المشروع منعزل تماماً عن أي مشروع آخر ولم يتم لمس أو تعديل أي ملف في WAYNAH.
-2. **إعداد التقنيات الأساسية:**
-   - Next.js 16.4.3 مع App Router.
-   - TypeScript بوضع `strict: true`.
-   - إدارة الحزم باستخدام `pnpm` (v12.8.1).
-   - تهيئة Tailwind CSS و ESLint 9.
-3. **تصميم قاعدة البيانات (Prisma ORM):**
-   - تثبيت `prisma` و `@prisma/client` بالإصدار المستقر 7.10.1.
-   - تهيئة `@prisma/adapter-pg` مع محرك PostgreSQL.
-   - إنشاء ملف `prisma/schema.prisma` بجميع النماذج المطلوبة:
-     - `ContentItem`: الفكرة والمحتوى الأساسي، وحالاته (`DRAFT`, `PENDING_APPROVAL`, `APPROVED`, `REJECTED`) وأنواعه.
-     - `PlatformVariant`: النسخ المخصصة للمنصات (`FACEBOOK`, `INSTAGRAM`, `TIKTOK`). استبعاد واتساب نهائياً.
-     - `MediaAsset`: وسائط المحتوى المرفقة (صور، فيديوهات، صوتيات، ترجمات).
-     - `AuditLog`: سجل العمليات الشامل للأحداث والمدد والأخطاء.
-   - إعداد `prisma.config.ts` المتوافق مع معايير Prisma 7.
-   - التحقق من المخطط عبر `prisma format` و `prisma validate` وتوليد العميل عبر `prisma generate`.
-4. **الأمان والتحقق من المدخلات (Zod):**
-   - إنشاء `src/lib/config/env.ts` مع فحص متغيرات البيئة ومنع تسريب الأسرار.
-   - إنشاء `src/lib/validation/content.schema.ts` لقواعد التحقق للمحتوى ونماذجه.
-   - إعداد ملف `.env.example` الآمن بدون أي أسرار، وضبط `.gitignore` لحظر تسريب المفاتيح.
-5. **هيكلية وحدات الأعمال والخدمات:**
-   - `src/lib/db/prisma.ts`: تهيئة اتصال Prisma الموحد.
-   - `src/modules/content/service.ts`: فئة الخدمة المسؤولة عن معالجة المحتوى وتسجيل العمليات في `AuditLog`.
-   - `src/types/index.ts`: تصدير الأنواع العامة.
-6. **الاختبارات وضمان الجودة (Vitest):**
-   - كتابة وتنفيذ 18 اختبار فحص وحدة وتكامل للبيئة والمخططات ونماذج الأعمال.
-   - اجتياز اختبار فحص الأنواع الصارم `tsc --noEmit`.
-   - اجتياز فحص `eslint` بنسبة 0 أخطاء و 0 تحذيرات.
-   - نجاح بناء الإنتاج الكامل `next build`.
+### 1. ملخص المراحل المنجزة
+
+#### المرحلة M001: تأسيس المشروع وقاعدة البيانات (مكتملة ✓)
+- تأسيس مستودع Next.js 16 + TypeScript + pnpm بشكل منعزل ومستقل تماماً داخل `mghal-content-os`.
+- إعداد مخطط Prisma 7 لقاعدة بيانات PostgreSQL (`ContentItem`, `PlatformVariant`, `MediaAsset`, `AuditLog`).
+- التحقق الصارم من البيئة بواسطة Zod وحجب الأسرار.
+- إعداد واجهة RTL متطورة باللغة العربية مع دعم خط Cairo.
+
+#### المرحلة M002: محرك الذكاء الاصطناعي وربط Gemini API (مكتملة ✓)
+- **واجهة تجريدية `AIProvider`:** تتيح سهولة استبدال أو ترقية مزودي الذكاء الاصطناعي مستقبلاً دون المساس بمنطق النظام.
+- **تكامل رسمي عبر `@google/genai`:** بناء `GeminiAdapter` مع برومبت نظام عالي التخصص في المحتوى العربي، وتوليد نصوص متزامنة لكل منصة:
+  - **Facebook:** منشورات تفاعلية سردية أو نقاشية مع دعوة صريحة للتعليق.
+  - **Instagram:** كابشن أنيق، نبرة ملهمة، وسوم منتقاة بدقة، ودعوة لحفظ المنشور.
+  - **TikTok:** سيناريو فيديو عمودي سريع مع هوك افتتاحي خاطف في أول 3 ثوانٍ.
+  - **حظر واتساب:** تطبيق حظر صارم ومبرمج يمنع توليد أو تضمين أي محتوى لواتساب.
+- **تخريج هيكلي صارم عبر Zod:** استخدام `generatedContentResultSchema` لضمان صحة واستقرار الـ JSON الوارد من النموذج.
+- **مسار برمجيات الخادم (API Route):** إنشاء `POST /api/content/generate` للربط بين الواجهات ومحرك الذكاء الاصطناعي.
+- **ربط الواجهة الأمامية:** إضافة شريط التوليد الفوري في الصفحة الرئيسية مع محاكاة وتفاعل حي.
 
 ---
 
-### 2. ما تم اختباره فعلياً
-| الفحص | الأداة / الأمر | النتيجة الفعلية |
+### 2. مصفوفة الاختبارات والتحقق الفعلي
+| الفحص | الأداة / الأمر | النتيجة |
 | :--- | :--- | :--- |
-| فحص المخطط وتنسيقه | `pnpm exec prisma format && prisma validate` | ناجح (The schema is valid) |
-| توليد عميل Prisma | `pnpm exec prisma generate` | ناجح (Client generated in 181ms) |
-| اختبارات الوحدة والتحقق | `pnpm test` (Vitest v5.0.5) | **18/18 ناجح** عبر 3 ملفات اختبار |
+| اختبارات الوحدة والتكامل | `pnpm test` (Vitest v5.0.5) | **25/25 اختبار ناجح بنسبة 100%** عبر 6 ملفات |
 | فحص الأنواع الصارم | `pnpm run typecheck` (`tsc --noEmit`) | **ناجح بدون أي أخطاء** |
-| فحص جودة الكود | `pnpm run lint` (`eslint`) | **ناجح (0 errors, 0 warnings)** |
-| بناء الإنتاج الكامل | `pnpm run build` (`next build`) | **ناجح (Compiled successfully in 5.7s)** |
+| فحص جودة الأكواد | `pnpm run lint` (`eslint`) | **ناجح: 0 أخطاء و 0 تحذيرات** |
+| بناء حزمة الإنتاج | `pnpm run build` (`next build`) | **ناجح (Compiled in 6.1s)** مع توليد API Route |
+| اختبار المتصفح والتفاعل الحي | Browser Subagent | **ناجح وتم تسجيل فيديو تفاعلي** |
 
 ---
 
-### 3. ما لم يتم اختباره (الشفافية الهندسية)
-- **الاتصال المباشر بقاعدة بيانات PostgreSQL حية وتطبيق Migrations:**
-  - لم يتم تطبيق `prisma migrate dev` على قاعدة بيانات حية لأن خادم PostgreSQL المحلي غير مشغل في بيئة النظام الحالية (المنفذ 5432 غير مستمع).
-  - تم تجهيز المخطط بالكامل واختباره وتوليد العميل، وتوفير ملف `docker-compose.yml` لتشغيل قاعدة بيانات محلية بضغطة زر واحدة.
+### 3. الملفات الرئيسية التي أُنشئت في M002
+- `src/lib/ai/types.ts`
+- `src/lib/ai/schema.ts`
+- `src/lib/ai/adapters/gemini.adapter.ts`
+- `src/lib/ai/index.ts`
+- `src/modules/content/ai-generator.ts`
+- `src/app/api/content/generate/route.ts`
+- `tests/ai-schema.test.ts`
+- `tests/ai-adapter.test.ts`
+- `tests/ai-generator.test.ts`
+- تحديث `src/app/page.tsx` و `src/app/layout.tsx`
 
 ---
 
-### 4. الملفات الرئيسية التي أُنشئت
-- `prisma/schema.prisma`
-- `prisma.config.ts`
-- `src/lib/config/env.ts`
-- `src/lib/db/prisma.ts`
-- `src/lib/validation/content.schema.ts`
-- `src/modules/content/types.ts`
-- `src/modules/content/service.ts`
-- `src/types/index.ts`
-- `tests/env.test.ts`
-- `tests/content-schema.test.ts`
-- `tests/content-service.test.ts`
-- `vitest.config.mts`
-- `docker-compose.yml`
-- `.env.example`
-- `README.md`
-- `docs/PROJECT_MASTER_BLUEPRINT.md`
-- `docs/PROJECT_STATUS.md`
-
----
-
-### 5. الخطوة التالية المقترحة
-- الانتقال إلى **المهمة M002: بناء محرك الذكاء الاصطناعي وربط Gemini API** لتوليد الأفكار والنصوص العربية المخصصة لكل منصة بعد مراجعة هذا التقرير وإغلاق M001 رسمياً.
+### 4. الخطوة التالية المقترحة
+- الانتقال إلى **المهمة M003: لوحة التحكم العربية الكاملة (Content Studio Dashboard)** لإدارة وحفظ واستعراض المسودات، وتحرير المحتوى وتصفحه، وإدارة دورة الاعتماد والرفض بصورة متكاملة.
