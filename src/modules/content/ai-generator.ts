@@ -1,6 +1,5 @@
 import { getAIProvider, type ContentGenerationInput, type GeneratedContentResult } from '@/lib/ai';
-import { ContentService } from './service';
-import prisma from '@/lib/db/prisma';
+import { ContentStorage } from './storage';
 
 export interface GenerateAndSaveOptions extends ContentGenerationInput {
   saveToDatabase?: boolean;
@@ -18,7 +17,7 @@ export interface GeneratedContentResponse {
 export class AIContentGenerator {
   /**
    * Generate Arabic content for Facebook, Instagram, and TikTok using AI provider
-   * and optionally persist to PostgreSQL database via ContentService.
+   * and persist to ContentStorage (Prisma or fallback store).
    */
   static async generate(options: GenerateAndSaveOptions): Promise<GeneratedContentResponse> {
     const provider = getAIProvider();
@@ -35,53 +34,48 @@ export class AIContentGenerator {
     let contentItemId: string | undefined;
     let auditLogId: string | undefined;
 
-    // Persist to database if requested (default: true)
+    // Persist to storage if requested
     if (options.saveToDatabase !== false) {
       try {
-        const item = await prisma.contentItem.create({
-          data: {
-            title: result.title,
-            topic: options.topic,
-            brief: result.brief,
-            contentType: result.contentType,
-            status: 'PENDING_APPROVAL',
-            language: result.language,
-            platformVariants: {
-              create: result.variants.map((v) => ({
-                platform: v.platform,
-                caption: v.caption,
-                hashtags: v.hashtags,
-                status: 'READY_FOR_REVIEW',
-              })),
-            },
-          },
+        const stored = await ContentStorage.add({
+          title: result.title,
+          topic: options.topic,
+          brief: result.brief,
+          contentType: result.contentType,
+          status: 'PENDING_APPROVAL',
+          language: result.language,
+          platformVariants: result.variants.map((v) => ({
+            id: '',
+            contentItemId: '',
+            platform: v.platform,
+            caption: v.caption,
+            hashtags: v.hashtags,
+            status: 'READY_FOR_REVIEW',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })),
         });
 
-        contentItemId = item.id;
+        contentItemId = stored.id;
         persisted = true;
 
-        const audit = await ContentService.recordAudit({
+        const audit = await ContentStorage.recordAudit({
           action: 'AI_CONTENT_GENERATION_SUCCESS',
           entityType: 'ContentItem',
-          entityId: item.id,
+          entityId: stored.id,
           status: 'SUCCESS',
           durationMs: result.durationMs,
           metadata: {
             modelUsed: result.modelUsed,
             topic: options.topic,
-            platformsCount: result.variants.length,
+            variantsCount: result.variants.length,
           },
         });
 
-        auditLogId = audit?.id;
-      } catch (dbError: unknown) {
-        // If DB is offline (e.g. dev environment before Postgres is started),
-        // we log gracefully and still return the generated content to the user.
+        auditLogId = audit.id;
+      } catch (err: unknown) {
         persisted = false;
-        console.warn(
-          'Database offline or migration pending; returning generated content in memory:',
-          (dbError as Error).message
-        );
+        console.warn('Failed to persist generated content:', (err as Error).message);
       }
     }
 
