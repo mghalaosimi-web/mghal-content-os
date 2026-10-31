@@ -10,6 +10,13 @@ vi.mock('child_process', () => {
   };
 });
 
+// Mock fs/promises
+vi.mock('fs/promises', () => ({
+  default: {
+    mkdir: vi.fn().mockResolvedValue(undefined),
+  }
+}));
+
 describe('Video Studio (FFmpeg Wrapper)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -26,8 +33,8 @@ describe('Video Studio (FFmpeg Wrapper)', () => {
       outputPath: 'output.mp4',
     });
 
-    // Simulate successful close
-    mockProcess.emit('close', 0);
+    // Simulate successful close after tick
+    setTimeout(() => mockProcess.emit('close', 0), 10);
 
     await promise;
 
@@ -51,7 +58,7 @@ describe('Video Studio (FFmpeg Wrapper)', () => {
       outputPath: 'output.mp4',
     });
 
-    mockProcess.emit('close', 0);
+    setTimeout(() => mockProcess.emit('close', 0), 10);
 
     await promise;
 
@@ -80,7 +87,7 @@ describe('Video Studio (FFmpeg Wrapper)', () => {
       outputPath: 'output.mp4',
     });
 
-    mockProcess.emit('close', 0);
+    setTimeout(() => mockProcess.emit('close', 0), 10);
 
     await promise;
 
@@ -103,9 +110,10 @@ describe('Video Studio (FFmpeg Wrapper)', () => {
       outputPath: 'output.mp4',
     });
 
-    // Simulate error output and non-zero close
-    mockProcess.stderr.emit('data', 'some ffmpeg error');
-    mockProcess.emit('close', 1);
+    setTimeout(() => {
+      mockProcess.stderr.emit('data', 'some ffmpeg error');
+      mockProcess.emit('close', 1);
+    }, 10);
 
     await expect(promise).rejects.toThrow('ffmpeg exited with code 1: some ffmpeg error');
   });
@@ -120,7 +128,7 @@ describe('Video Studio (FFmpeg Wrapper)', () => {
       outputPath: 'output.mp4',
     });
 
-    mockProcess.emit('error', new Error('ENOENT'));
+    setTimeout(() => mockProcess.emit('error', new Error('ENOENT')), 10);
 
     await expect(promise).rejects.toThrow('Failed to spawn ffmpeg: ENOENT');
   });

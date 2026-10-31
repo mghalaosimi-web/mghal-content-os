@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { join } from 'path';
+import { tmpdir } from 'os';
 import { generateSrtFile } from '@/modules/media/subtitle-generator';
 
 const subtitleItemSchema = z.object({
@@ -29,13 +30,13 @@ export async function POST(req: NextRequest) {
 
     const { subtitleId, items } = parsed.data;
 
-    // Secure path generation ensuring isolation
-    const mediaDir = join(process.cwd(), 'public', 'generated', 'media');
+    // Use /tmp directory to be compatible with serverless environments (e.g. Vercel)
+    const mediaDir = join(tmpdir(), 'mghal-media');
     const outputPath = join(mediaDir, `${subtitleId}.srt`);
 
     await generateSrtFile(items, outputPath);
 
-    return NextResponse.json({ success: true, message: 'Subtitles generated successfully' });
+    return NextResponse.json({ success: true, message: 'Subtitles generated successfully', outputPath });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }

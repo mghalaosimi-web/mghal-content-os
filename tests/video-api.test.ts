@@ -3,6 +3,7 @@ import { POST } from '@/app/api/media/video/route';
 import { NextRequest } from 'next/server';
 import { assembleVideo } from '@/modules/media/video-studio';
 import { join } from 'path';
+import { tmpdir } from 'os';
 
 vi.mock('@/modules/media/video-studio', () => ({
   assembleVideo: vi.fn(),
@@ -45,7 +46,7 @@ describe('Video API Route', () => {
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
 
-    const mediaDir = join(process.cwd(), 'public', 'generated', 'media');
+    const mediaDir = join(tmpdir(), 'mghal-media');
     expect(assembleVideo).toHaveBeenCalledWith({
       inputVideo: join(mediaDir, 'video123.mp4'),
       inputAudio: undefined,

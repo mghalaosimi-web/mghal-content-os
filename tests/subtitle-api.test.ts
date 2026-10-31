@@ -3,6 +3,7 @@ import { POST } from '@/app/api/media/subtitles/route';
 import { NextRequest } from 'next/server';
 import { generateSrtFile } from '@/modules/media/subtitle-generator';
 import { join } from 'path';
+import { tmpdir } from 'os';
 
 vi.mock('@/modules/media/subtitle-generator', () => ({
   generateSrtFile: vi.fn(),
@@ -55,7 +56,7 @@ describe('Subtitle API Route', () => {
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
 
-    const expectedPath = join(process.cwd(), 'public', 'generated', 'media', 'subs123.srt');
+    const expectedPath = join(tmpdir(), 'mghal-media', 'subs123.srt');
     expect(generateSrtFile).toHaveBeenCalledWith(items, expectedPath);
   });
 

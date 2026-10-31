@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import path from 'path';
 
 export interface SubtitleItem {
   id: number;
@@ -11,6 +12,9 @@ export async function generateSrtFile(items: SubtitleItem[], outputPath: string)
   if (!items || items.length === 0) {
     throw new Error('Subtitle items cannot be empty');
   }
+
+  // Ensure output directory exists
+  await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
   const srtContent = items.map(item => {
     return `${item.id}\n${item.startTime} --> ${item.endTime}\n${item.text}\n`;
