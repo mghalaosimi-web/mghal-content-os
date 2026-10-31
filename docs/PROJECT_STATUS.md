@@ -37,7 +37,7 @@
 ### 2. مصفوفة الاختبارات والتحقق الفعلي
 | الفحص | الأداة / الأمر | النتيجة |
 | :--- | :--- | :--- |
-| اختبارات الوحدة والتكامل | `pnpm test` (Vitest v5.0.5) | **46/46 اختبار ناجح بنسبة 100%** عبر 10 ملفات |
+| اختبارات الوحدة والتكامل | `pnpm test` (Vitest v5.0.5) | **54/54 اختبار ناجح بنسبة 100%** عبر 12 ملفات |
 | فحص الأنواع الصارم | `pnpm run typecheck` (`tsc --noEmit`) | **ناجح بدون أي أخطاء** |
 | فحص جودة الأكواد | `pnpm run lint` (`eslint`) | **ناجح: 0 أخطاء و 0 تحذيرات** |
 | بناء حزمة الإنتاج | `pnpm run build` (`next build`) | **ناجح** |
@@ -45,5 +45,6 @@
 ---
 
 ### 3. الخطوة الحالية المقترحة
-- الانتقال إلى **المرحلة M007: Automated FFmpeg Video Reel Assembly & Arabic Subtitle Burn-in**.
+- البدء في **المرحلة M007: Automated FFmpeg Video Reel Assembly & Arabic Subtitle Burn-in**.
 - تأسيس `video-studio.ts` داخل `src/modules/media/` كمرحلة أولى لبناء محرك دمج الفيديو باستخدام FFmpeg.
+- تم الانتهاء من إضافة مسار الـ API `POST /api/media/video` كجزء من M007.

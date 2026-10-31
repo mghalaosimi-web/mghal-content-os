@@ -35,7 +35,7 @@ describe('Video Studio (FFmpeg Wrapper)', () => {
       '-loglevel', 'error',
       '-y',
       '-i', 'input.mp4',
-      '-c', 'copy',
+      '-c:v', 'copy',
       'output.mp4',
     ]);
   });
@@ -60,11 +60,35 @@ describe('Video Studio (FFmpeg Wrapper)', () => {
       '-y',
       '-i', 'input.mp4',
       '-i', 'audio.mp3',
-      '-c:v', 'copy',
       '-c:a', 'aac',
       '-map', '0:v:0',
       '-map', '1:a:0',
       '-shortest',
+      '-c:v', 'copy',
+      'output.mp4',
+    ]);
+  });
+
+  it('should spawn ffmpeg with correct arguments when subtitlePath is provided', async () => {
+    const mockProcess = new EventEmitter() as any;
+    mockProcess.stderr = new EventEmitter();
+    (child_process.spawn as any).mockReturnValue(mockProcess);
+
+    const promise = assembleVideo({
+      inputVideo: 'input.mp4',
+      subtitlePath: 'subs.srt',
+      outputPath: 'output.mp4',
+    });
+
+    mockProcess.emit('close', 0);
+
+    await promise;
+
+    expect(child_process.spawn).toHaveBeenCalledWith('ffmpeg', [
+      '-loglevel', 'error',
+      '-y',
+      '-i', 'input.mp4',
+      '-vf', 'subtitles=subs.srt',
       'output.mp4',
     ]);
   });
